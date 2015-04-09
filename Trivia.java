@@ -7,7 +7,7 @@ public class Trivia {
 		
 		ArrayList<Question> questions = new ArrayList<Question>();
 		ArrayList<String> questionStrings = new ArrayList<String>();
-		ArrayList<TieQuestion> tieBreaks= new ArrayList<TieQuestion>();
+		ArrayList<TieBreak> tieBreaks= new ArrayList<TieBreak>();
 		ArrayList<Player> players = new ArrayList<Player>();
 		ArrayList<Player> winners= new ArrayList<Player>();
 		ArrayList<Integer> tieValue= new ArrayList<Integer>();
@@ -38,7 +38,7 @@ public class Trivia {
 			lineCount++;
 		}
 		while(tieScanner.hasNext()){
-			tieBreaks.add(new TieQuestion(tieScanner.nextLine()));
+			tieBreaks.add(new TieBreak(tieScanner.nextLine()));
 			tieLineCount++;
 		}
 		System.out.print("How many players will there be?: ");
@@ -136,8 +136,7 @@ public class Trivia {
 			System.out.print("Answer: ");
 			tieAnswer= validateInt(keyboard.nextLine());
 			tieValue.add(tieBreaks.get(tieRandom).getAnswers()-tieAnswer);
-			
-			
+			}	
 		}
 		else{
 			System.out.println("The winner is "+ winners.get(0).getName());

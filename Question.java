@@ -9,6 +9,10 @@ public class Question {
 	private String[] answers;
 	private String question;
 	
+	/**
+	 * Initializer Constructor
+	 * @param fromFile
+	 */
 	public Question(String fromFile) {
 		rightAnswer = parseRightAnswer(fromFile);
 		answers = parseAnswers(fromFile);
@@ -34,12 +38,17 @@ public class Question {
 		return temp;
 	}
 	
+	/**
+	 * Extracts the answers from string in the questions file.
+	 * @param questionString
+	 * @return String[] answers
+	 */
 	private String[] parseAnswers(String questionString) {
 		String[] answers = new String[4];
 		int startIndex = 0;
 		int endIndex = questionString.length()-2;
 		String trimmed = "";
-		for (int i = 0; i < questionString.length()-1; i++) {
+		for (int i = 0; i < questionString.length(); i++) {
 			if (questionString.charAt(i) == '?') {
 				startIndex = i + 2;
 				break;
@@ -48,7 +57,7 @@ public class Question {
 		trimmed = questionString.substring(startIndex, endIndex);
 		int[] startIndices = new int[4];
 		int counter = 0;
-		for (int i = 0; i < trimmed.length()-1; i++) {
+		for (int i = 0; i < trimmed.length(); i++) {
 			if (trimmed.charAt(i) == '.') {
 				startIndices[counter] = i-1;
 				counter++;
@@ -91,6 +100,10 @@ public class Question {
 		return rightAnswer;
 	}
 
+	/**
+	 * Get method for String[] answers
+	 * @return String[] answers
+	 */
 	public String[] getAnswers() {
 		return answers;
 	}

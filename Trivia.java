@@ -7,10 +7,10 @@ public class Trivia {
 		
 		ArrayList<Question> questions = new ArrayList<Question>();
 		ArrayList<String> questionStrings = new ArrayList<String>();
-		ArrayList<TieQuestion> tieBreaks= new ArrayList<TieQuestion>();
+		ArrayList<TieBreak> tieBreaks= new ArrayList<TieBreak>();
 		ArrayList<Player> players = new ArrayList<Player>();
 		ArrayList<Player> winners= new ArrayList<Player>();
-		ArrayList<Integer> tieValue= new ArrayList<Integer>();
+		ArrayList<Player> tieWinners= new ArrayList<Player>();
 		
 		
 		File questionFile = new File("Questions.dat");
@@ -38,7 +38,7 @@ public class Trivia {
 			lineCount++;
 		}
 		while(tieScanner.hasNext()){
-			tieBreaks.add(new TieQuestion(tieScanner.nextLine()));
+			tieBreaks.add(new TieBreak(tieScanner.nextLine()));
 			tieLineCount++;
 		}
 		System.out.print("How many players will there be?: ");
@@ -74,9 +74,9 @@ public class Trivia {
 		}
 		
 		int randomNum=-1;
-		boolean underSix=true;
+		//boolean underSix=true;
 		String pinStr="";
-		for(int counter=0; counter<6; counter++){
+		for(int counter=0; counter<1; counter++){
 			randomNum=random(questions.size());
 			for(int i=0; i<numPlayers; i++){
 				System.out.println("\n"+players.get(i).getName()+"'s Turn\n");
@@ -113,40 +113,68 @@ public class Trivia {
 			
 		}
 		winners.add(players.get(0));
-		for(int i=0; i<players.size(); i++){
+		for(int i=1; i<players.size(); i++){
 			if(players.get(i).getPoints()>winners.get(0).getPoints()){
 				winners.clear();
 				winners.add(players.get(i));
 			}
 			else if(players.get(i).getPoints()==winners.get(0).getPoints()){
-				winners.add(players.get(1));
+				winners.add(players.get(i));
 			}
-			else{}
 		}
 		if(winners.size()>1){
+			boolean flag= true;
 			int tieRandom=-1;
 			int tieAnswer;
-			tieRandom= random(winners.size());
-			for(int i=0; i<winners.size()-1;i++){
-				System.out.println("\n"+winners.get(i).getName()+"'s Turn\n");
-				System.out.print("Enter Pin: ");
-				pinStr= keyboard.nextLine();
-				while(validatePin(pinStr)!= winners.get(i).getPin()){
-					System.out.println("\n Error!");
-					System.out.print(winners.get(i).getName()+", please enter pin: ");
+			while(flag){//while flag
+				tieRandom= random(winners.size());
+				for(int i=0; i<winners.size();i++){
+					System.out.println("\n"+winners.get(i).getName()+"'s Turn\n");
+					System.out.print("Enter Pin: ");
 					pinStr= keyboard.nextLine();
+					while(validatePin(pinStr)!= winners.get(i).getPin()){
+						System.out.println("\n Error!");
+						System.out.print(winners.get(i).getName()+", please enter pin: ");
+						pinStr= keyboard.nextLine();
+					}
+					System.out.println(tieBreaks.get(tieRandom).getQuestion());
+					System.out.print("Answer: ");
+					tieAnswer= validateInt(keyboard.nextLine());
+					winners.get(i).setTieValue(tieBreaks.get(tieRandom).getAnswers()-tieAnswer);
 				}
-			System.out.println(tieBreaks.get(tieRandom).getQuestion());
-			System.out.print("Answer: ");
-			tieAnswer= validateInt(keyboard.nextLine());
-			tieValue.add(tieBreaks.get(tieRandom).getAnswers()-tieAnswer);
-			
-			
+					
+				tieWinners.add(winners.get(0));
+				for(int i=1; i<winners.size(); i++){
+					if(winners.get(i).getTieValue()<tieWinners.get(0).getTieValue()){
+						tieWinners.clear();
+						tieWinners.add(winners.get(i));
+					}
+					else if(winners.get(i).getTieValue()==tieWinners.get(0).getTieValue()){
+						tieWinners.add(winners.get(i));
+					}	
+				}
+				if(tieWinners.size()>1){
+					winners.clear();
+					for(int i=0; i<tieWinners.size(); i++){
+						winners.add(tieWinners.get(i));
+						flag= true;
+					}
+					tieWinners.clear();
+				}
+
+				else{
+					flag= false;
+					Collections.sort(tieWinners,Player.PlayerTieComparator);
+					System.out.println("The winner is "+ tieWinners.get(0).getName());//print winner
+				}
+			}//end while
 		}
+		
 		else{
-			System.out.println("The winner is "+ winners.get(0).getName());
+			Collections.sort(players,Player.PlayerPointComparator);
+			System.out.println("The winner is "+ players.get(players.size()-1).getName());
 		}
-	}
+	}	
 	
 	public static int random(int num){
 	
@@ -156,8 +184,7 @@ public class Trivia {
 		return randomNumber;
 	}	
 	
-	public static int validatePin (String str)
-	{
+	public static int validatePin (String str){
 		Scanner keyboard= new Scanner(System.in);
 		int number=-1;
 		boolean isItInt=false;

@@ -48,7 +48,7 @@ public class TieBreak {
 			else
 				break;
 		}
-		return parsed;
+		return parsed.concat("?");
 	}
 	
 	/**

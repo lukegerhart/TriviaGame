@@ -10,7 +10,7 @@ public class Trivia {
 		ArrayList<TieBreak> tieBreaks= new ArrayList<TieBreak>();
 		ArrayList<Player> players = new ArrayList<Player>();
 		ArrayList<Player> winners= new ArrayList<Player>();
-		ArrayList<Integer> tieValue= new ArrayList<Integer>();
+		ArrayList<Player> tieWinners= new ArrayList<Player>();
 		
 		
 		File questionFile = new File("Questions.dat");
@@ -74,7 +74,7 @@ public class Trivia {
 		}
 		
 		int randomNum=-1;
-		boolean underSix=true;
+		//boolean underSix=true;
 		String pinStr="";
 		for(int counter=0; counter<1; counter++){
 			randomNum=random(questions.size());
@@ -93,6 +93,10 @@ public class Trivia {
 				}
 				System.out.print("Answer: ");
 				String answerChoice= keyboard.nextLine();
+				while(!(answerChoice.equalsIgnoreCase("a")||answerChoice.equalsIgnoreCase("b")||answerChoice.equalsIgnoreCase("c")||answerChoice.equalsIgnoreCase("d"))){
+					System.out.print("Answer must be A, B, C, or D\nAnswer: ");
+					answerChoice= keyboard.nextLine();
+				}
 				if(answerChoice.equalsIgnoreCase(questions.get(randomNum).getRightAnswer())){
 					//System.out.println("You are right");
 					players.get(i).addPoint();
@@ -117,12 +121,12 @@ public class Trivia {
 			else if(players.get(i).getPoints()==winners.get(0).getPoints()){
 				winners.add(players.get(i));
 			}
-			else{}
 		}
 		if(winners.size()>1){
-			boolean repeat = true;
+			boolean flag= true;
 			int tieRandom=-1;
 			int tieAnswer;
+			while(flag){//while flag
 				tieRandom= random(winners.size());
 				for(int i=0; i<winners.size();i++){
 					System.out.println("\n"+winners.get(i).getName()+"'s Turn\n");
@@ -136,14 +140,41 @@ public class Trivia {
 					System.out.println(tieBreaks.get(tieRandom).getQuestion());
 					System.out.print("Answer: ");
 					tieAnswer= validateInt(keyboard.nextLine());
-					tieValue.add(tieBreaks.get(tieRandom).getAnswers()-tieAnswer);
+					winners.get(i).setTieValue(tieBreaks.get(tieRandom).getAnswers()-tieAnswer);
 				}
-			System.out.println("The winner is: " + winners.get(0).getName());
+					
+				tieWinners.add(winners.get(0));
+				for(int i=1; i<winners.size(); i++){
+					if(winners.get(i).getTieValue()<tieWinners.get(0).getTieValue()){
+						tieWinners.clear();
+						tieWinners.add(winners.get(i));
+					}
+					else if(winners.get(i).getTieValue()==tieWinners.get(0).getTieValue()){
+						tieWinners.add(winners.get(i));
+					}	
+				}
+				if(tieWinners.size()>1){
+					winners.clear();
+					for(int i=0; i<tieWinners.size(); i++){
+						winners.add(tieWinners.get(i));
+						flag= true;
+					}
+					tieWinners.clear();
+				}
+
+				else{
+					flag= false;
+					Collections.sort(tieWinners,Player.PlayerTieComparator);
+					System.out.println("The winner is "+ tieWinners.get(0).getName());//print winner
+				}
+			}//end while
 		}
+		
 		else{
-			System.out.println("The winner is "+ winners.get(0).getName());
+			Collections.sort(players,Player.PlayerPointComparator);
+			System.out.println("The winner is "+ players.get(players.size()-1).getName());
 		}
-	}
+	}	
 	
 	public static int random(int num){
 	
@@ -153,8 +184,7 @@ public class Trivia {
 		return randomNumber;
 	}	
 	
-	public static int validatePin (String str)
-	{
+	public static int validatePin (String str){
 		Scanner keyboard= new Scanner(System.in);
 		int number=-1;
 		boolean isItInt=false;

@@ -1,5 +1,6 @@
 /**
  * Player class for the trivia game.
+ * 
  * @author Luke Gerhart
  * Date: 4/2/15
  *
@@ -9,7 +10,7 @@ public class Player {
 	private int points;
 	private int pin;
 	private String name;
-	
+	private int tieValue;
 	/**
 	 * Constructor.
 	 */
@@ -17,6 +18,7 @@ public class Player {
 		pin = 0;
 		points = 0;
 		name = "";
+		tieValue=0;
 	}
 	
 	/**
@@ -51,12 +53,25 @@ public class Player {
 		return (this.pin == pin);
 	}
 	
-	/**
-	 * Set the player's pin
-	 * @param pin
-	 */
 	public void setPin(int pin) {
 		this.pin = pin;
+	}
+	/**
+	 * Set method for tieValue
+	 * Used in tie break situations 
+	 * to determine who is closer to the correct answer
+	 * @param val (user's answer)
+	 */ 
+	public void setTieValue(int val){
+		tieValue=Math.abs(val);
+	}
+	
+	/**
+	 * Get method for tie value
+	 * @returns tieValue
+	 */
+	public int getTieValue(){
+		return tieValue;
 	}
 	
 	/**

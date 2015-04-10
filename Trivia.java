@@ -76,7 +76,7 @@ public class Trivia {
 		int randomNum=-1;
 		boolean underSix=true;
 		String pinStr="";
-		for(int counter=0; counter<6; counter++){
+		for(int counter=0; counter<1; counter++){
 			randomNum=random(questions.size());
 			for(int i=0; i<numPlayers; i++){
 				System.out.println("\n"+players.get(i).getName()+"'s Turn\n");
@@ -109,34 +109,36 @@ public class Trivia {
 			
 		}
 		winners.add(players.get(0));
-		for(int i=0; i<players.size(); i++){
+		for(int i=1; i<players.size(); i++){
 			if(players.get(i).getPoints()>winners.get(0).getPoints()){
 				winners.clear();
 				winners.add(players.get(i));
 			}
 			else if(players.get(i).getPoints()==winners.get(0).getPoints()){
-				winners.add(players.get(1));
+				winners.add(players.get(i));
 			}
 			else{}
 		}
 		if(winners.size()>1){
+			boolean repeat = true;
 			int tieRandom=-1;
 			int tieAnswer;
-			tieRandom= random(winners.size());
-			for(int i=0; i<winners.size()-1;i++){
-				System.out.println("\n"+winners.get(i).getName()+"'s Turn\n");
-				System.out.print("Enter Pin: ");
-				pinStr= keyboard.nextLine();
-				while(validatePin(pinStr)!= winners.get(i).getPin()){
-					System.out.println("\n Error!");
-					System.out.print(winners.get(i).getName()+", please enter pin: ");
+				tieRandom= random(winners.size());
+				for(int i=0; i<winners.size();i++){
+					System.out.println("\n"+winners.get(i).getName()+"'s Turn\n");
+					System.out.print("Enter Pin: ");
 					pinStr= keyboard.nextLine();
+					while(validatePin(pinStr)!= winners.get(i).getPin()){
+						System.out.println("\n Error!");
+						System.out.print(winners.get(i).getName()+", please enter pin: ");
+						pinStr= keyboard.nextLine();
+					}
+					System.out.println(tieBreaks.get(tieRandom).getQuestion());
+					System.out.print("Answer: ");
+					tieAnswer= validateInt(keyboard.nextLine());
+					tieValue.add(tieBreaks.get(tieRandom).getAnswers()-tieAnswer);
 				}
-			System.out.println(tieBreaks.get(tieRandom).getQuestion());
-			System.out.print("Answer: ");
-			tieAnswer= validateInt(keyboard.nextLine());
-			tieValue.add(tieBreaks.get(tieRandom).getAnswers()-tieAnswer);
-			}	
+			System.out.println("The winner is: " + winners.get(0).getName());
 		}
 		else{
 			System.out.println("The winner is "+ winners.get(0).getName());

@@ -1,6 +1,5 @@
 /**
  * Player class for the trivia game.
- * 
  * @author Luke Gerhart
  * Date: 4/2/15
  *
@@ -52,15 +51,26 @@ public class Player {
 		return (this.pin == pin);
 	}
 	
+	/**
+	 * Set the player's pin
+	 * @param pin
+	 */
 	public void setPin(int pin) {
 		this.pin = pin;
 	}
 	
-	
+	/**
+	 * Set the player's name
+	 * @param name
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 	
+	/**
+	 * Get method for the player's name
+	 * @return name
+	 */
 	public String getName() {
 		return name;
 	}

@@ -5,12 +5,15 @@
  * Date: 4/2/15
  *
  */
+import java.util.Comparator;
+
 public class Player {
 
 	private int points;
 	private int pin;
 	private String name;
 	private int tieValue;
+	
 	/**
 	 * Constructor.
 	 */
@@ -53,9 +56,14 @@ public class Player {
 		return (this.pin == pin);
 	}
 	
+	/**
+	 * Set the user's pin
+	 * @param pin
+	 */
 	public void setPin(int pin) {
 		this.pin = pin;
 	}
+	
 	/**
 	 * Set method for tieValue
 	 * Used in tie break situations 
@@ -88,5 +96,23 @@ public class Player {
 	 */
 	public String getName() {
 		return name;
-	}
+	}	
+	
+	/**
+	 * Comparator for Player class to compare players by their tieValue values.
+	 */
+	public static Comparator<Player> PlayerTieComparator = new Comparator<Player>() {
+		public int compare(Player one, Player two) {
+			return one.getTieValue()-two.getTieValue();
+		}
+	};
+	
+	/**
+	 * Comparator for Player class to compare players by their points value.
+	 */
+	public static Comparator<Player> PlayerPointComparator = new Comparator<Player>() {
+		public int compare(Player one, Player two) {
+			return one.getPoints()-two.getPoints();
+		}
+	};
 }

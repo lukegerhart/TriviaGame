@@ -210,6 +210,8 @@ public class Trivia {
 	 * @return int pin
 	 */
 	public static int validatePin (String str){
+		if (str.charAt(0) == '-')
+			str = str.substring(1);
 		int number=-1;
 		boolean isItInt=false;
 		boolean fourDigit=false;

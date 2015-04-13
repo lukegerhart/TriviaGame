@@ -1,12 +1,13 @@
 import java.io.*;
 import java.util.*;
 
+import javax.swing.JOptionPane;
+
 public class Trivia {
 
 	public static void main(String[] args) {
 		
 		ArrayList<Question> questions = new ArrayList<Question>();
-		ArrayList<String> questionStrings = new ArrayList<String>();
 		ArrayList<TieBreak> tieBreaks= new ArrayList<TieBreak>();
 		ArrayList<Player> players = new ArrayList<Player>();
 		ArrayList<Player> winners= new ArrayList<Player>();
@@ -17,7 +18,6 @@ public class Trivia {
 		Scanner questionScanner = null;
 		File tieFile= new File("TieBreak.dat");
 		Scanner tieScanner= null;
-		Scanner keyboard = new Scanner(System.in);
 		String input = "";
 		int numPlayers = 0;
 		int lineCount=0;
@@ -41,76 +41,67 @@ public class Trivia {
 			tieBreaks.add(new TieBreak(tieScanner.nextLine()));
 			tieLineCount++;
 		}
-		System.out.print("How many players will there be?: ");
-		input = keyboard.nextLine();
+		input = JOptionPane.showInputDialog("How many players will there be?");
 		boolean notInteger=true;
 		while (numPlayers < 2 && notInteger) {
 			try {
 				numPlayers = Integer.parseInt(input);
 				notInteger=false;
 				if (numPlayers < 2) {
-					System.out.println("There must be at least two players.");
-					System.out.print("How many players will there be?: ");
-					input = keyboard.nextLine();
+					Object[] options = { "OK", "CANCEL" };
+					JOptionPane.showOptionDialog(null, "There must be at least two players.", "Warning", 
+							JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
+					        null, options, options[0]);
+					input = JOptionPane.showInputDialog("How many players will there be?");
 					notInteger=true;
 				}
 
 			} catch(NumberFormatException e) {
 				notInteger=true;
-				System.out.print("Error: invalid input!\nHow many players will there be?: ");
-				input = keyboard.nextLine();
+				input = JOptionPane.showInputDialog("Error: invalid input!\nHow many players will there be?: ");
 			}
 		}
 		for(int i=0; i<numPlayers; i++){
 			players.add(new Player());
-			System.out.print("Enter Player Name: ");
-			players.get(i).setName(keyboard.nextLine());
-			System.out.print("Enter Player Pin: ");
-			pin= validatePin(keyboard.nextLine());
+			players.get(i).setName(JOptionPane.showInputDialog(null, "Enter Player " + (i+1) + " Name.", "Player Name", JOptionPane.QUESTION_MESSAGE));
+			pin= validatePin(JOptionPane.showInputDialog(null, "Enter " + players.get(i).getName() + "'s Pin.", "PIN", JOptionPane.QUESTION_MESSAGE));
 			players.get(i).setPin(pin);
-			System.out.println("");
-			
-			
 		}
 		
 		int randomNum=-1;
-		//boolean underSix=true;
 		String pinStr="";
-		for(int counter=0; counter<1; counter++){
+		String message = "";
+		Object answerChoice = null;
+		Object[] answers = new Object[4];
+		String ansChoice = "";
+		for(int counter=0; counter < 2; counter++){
 			randomNum=random(questions.size());
 			for(int i=0; i<numPlayers; i++){
-				System.out.println("\n"+players.get(i).getName()+"'s Turn\n");
-				System.out.print("Enter Pin: ");
-				pinStr= keyboard.nextLine();
+				pinStr = JOptionPane.showInputDialog(null, players.get(i).getName()+"'s Turn. \nEnter Pin: ", "PIN", JOptionPane.QUESTION_MESSAGE);
 				while(validatePin(pinStr)!= players.get(i).getPin()){
-					System.out.println("\n Error!");
-					System.out.print(players.get(i).getName()+", please enter pin: ");
-					pinStr= keyboard.nextLine();
-				}
-				System.out.println(questions.get(randomNum).getQuestion());
+					pinStr = JOptionPane.showInputDialog(null, "Error! \nPlease enter correct pin.", "Warning", JOptionPane.WARNING_MESSAGE);
+				}				
 				for (int k = 0; k < 4; k++) {
-					System.out.println(questions.get(randomNum).getAnswers()[k]);
+					answers[k] = questions.get(randomNum).getAnswers()[k];
 				}
-				System.out.print("Answer: ");
-				String answerChoice= keyboard.nextLine();
-				while(!(answerChoice.equalsIgnoreCase("a")||answerChoice.equalsIgnoreCase("b")||answerChoice.equalsIgnoreCase("c")||answerChoice.equalsIgnoreCase("d"))){
-					System.out.print("Answer must be A, B, C, or D\nAnswer: ");
-					answerChoice= keyboard.nextLine();
-				}
-				if(answerChoice.equalsIgnoreCase(questions.get(randomNum).getRightAnswer())){
-					//System.out.println("You are right");
+				answerChoice = JOptionPane.showInputDialog(null, questions.get(randomNum).getQuestion(), "Question " + (counter + 1), 
+						JOptionPane.QUESTION_MESSAGE, null, answers, answers[0]);
+				ansChoice = ((String) answerChoice);
+				ansChoice = String.valueOf(ansChoice.charAt(0));
+				if(ansChoice.equalsIgnoreCase(questions.get(randomNum).getRightAnswer())){
 					players.get(i).addPoint();
 				}
 				else{
-					//System.out.println("You are wrong");
+					//Do nothing
 				}
 				
 			}	
 			questions.remove(randomNum);
 			for(int i=0; i<numPlayers; i++){
-				System.out.println(players.get(i).getName()+"'s Points: "+players.get(i).getPoints());
+				message = message.concat(players.get(i).getName()+"'s Points: "+players.get(i).getPoints() + "\n");
 			}
-			
+			JOptionPane.showMessageDialog(null, message, "Points", JOptionPane.INFORMATION_MESSAGE);
+			message = "";
 		}
 		winners.add(players.get(0));
 		for(int i=1; i<players.size(); i++){
@@ -129,17 +120,11 @@ public class Trivia {
 			while(flag){//while flag
 				tieRandom= random(winners.size());
 				for(int i=0; i<winners.size();i++){
-					System.out.println("\n"+winners.get(i).getName()+"'s Turn\n");
-					System.out.print("Enter Pin: ");
-					pinStr= keyboard.nextLine();
+					pinStr = JOptionPane.showInputDialog(null, winners.get(i).getName()+"'s Turn. \nEnter Pin: ", "PIN", JOptionPane.QUESTION_MESSAGE);
 					while(validatePin(pinStr)!= winners.get(i).getPin()){
-						System.out.println("\n Error!");
-						System.out.print(winners.get(i).getName()+", please enter pin: ");
-						pinStr= keyboard.nextLine();
+						pinStr = JOptionPane.showInputDialog(null, "Error! \nPlease enter correct pin.", "Warning", JOptionPane.WARNING_MESSAGE);
 					}
-					System.out.println(tieBreaks.get(tieRandom).getQuestion());
-					System.out.print("Answer: ");
-					tieAnswer= validateInt(keyboard.nextLine());
+					tieAnswer = validateInt(JOptionPane.showInputDialog(null, tieBreaks.get(tieRandom).getQuestion(), "Tie Break Question", JOptionPane.QUESTION_MESSAGE));
 					winners.get(i).setTieValue(tieBreaks.get(tieRandom).getAnswers()-tieAnswer);
 				}
 					
@@ -165,17 +150,21 @@ public class Trivia {
 				else{
 					flag= false;
 					Collections.sort(tieWinners,Player.PlayerTieComparator);
-					System.out.println("The winner is "+ tieWinners.get(0).getName());//print winner
+					JOptionPane.showMessageDialog(null, "The winner is "+ tieWinners.get(0).getName(), "Congratulations!", JOptionPane.INFORMATION_MESSAGE);
 				}
 			}//end while
 		}
-		
-		else{
+		else {
 			Collections.sort(players,Player.PlayerPointComparator);
-			System.out.println("The winner is "+ players.get(players.size()-1).getName());
+			JOptionPane.showMessageDialog(null, "The winner is "+ players.get(players.size()-1).getName(), "Congratualations!", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}	
 	
+	/**
+	 * Method used to generate random number
+	 * @param num max value of the random number 
+	 * @return randomNumber
+	 */
 	public static int random(int num){
 	
 		Random generator= new Random ();
@@ -184,8 +173,12 @@ public class Trivia {
 		return randomNumber;
 	}	
 	
+	/**
+	 * Method used to validate user's pin
+	 * @param str String pin
+	 * @return int pin
+	 */
 	public static int validatePin (String str){
-		Scanner keyboard= new Scanner(System.in);
 		int number=-1;
 		boolean isItInt=false;
 		boolean fourDigit=false;
@@ -202,22 +195,24 @@ public class Trivia {
 				else
 				{
 					isItInt=false;
-					System.out.print("Pin must be a positive four(4) digit number \n Please enter a new pin:");
-					str= keyboard.nextLine();
+					str = JOptionPane.showInputDialog(null, "Pin must be a positive four(4) digit number. \nPlease enter a new pin.", "Warning", JOptionPane.WARNING_MESSAGE);
 				}
 			}
 			catch(NumberFormatException n)
 			{
 				isItInt=false;
-				System.out.print("Error: Enter a number:");
-				str= keyboard.nextLine();		
+				str = JOptionPane.showInputDialog(null, "Error.\nEnter a number.", "Warning", JOptionPane.WARNING_MESSAGE);
 			}
 		}
 		return number;
 	}
-	public static int validateInt (String str)
-	{
-		Scanner keyboard= new Scanner(System.in);
+	
+	/**
+	 * Method used to validate user input integers
+	 * @param str String of integer that user entered
+	 * @return correct integer value 
+	 */
+	public static int validateInt (String str) {
 		int number=-1;
 		boolean isItInt=false;
 		boolean greaterThan0=false;
@@ -234,15 +229,13 @@ public class Trivia {
 				else
 				{
 					isItInt=false;
-					System.out.print("Number must be 0 or greater\n Please enter a new number:");
-					str= keyboard.nextLine();
+					str = JOptionPane.showInputDialog(null, "Number must be 0 or greater.\nPlease enter a new number.", "Warning", JOptionPane.WARNING_MESSAGE);
 				}
 			}
 			catch(NumberFormatException n)
 			{
 				isItInt=false;
-				System.out.print("Error: Enter a number:");
-				str= keyboard.nextLine();		
+				str = JOptionPane.showInputDialog(null, "Error.\nEnter a number.", "Warning", JOptionPane.WARNING_MESSAGE);
 			}
 		}
 		return number;

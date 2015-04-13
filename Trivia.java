@@ -1,3 +1,20 @@
+/**
+ * Trivia class that runs the trivia game.
+ * There must be at least two players, and each player has a personal PIN 
+ * that they enter at the beginning at the round.
+ * The game consists of 6 randomly chosen questions. Each question has 4 possible answers, labeled A, B, C, D.
+ * The player chooses their answer in the drop down menu.
+ * If two or more players have the same number of points at the end of the 6th question, the game enters tie-break mode
+ * tie break questions are all free response questions, and all answers are positive integers.
+ * At the end of each tie-break round, the player with the answer closest to the actual answer
+ * (regardless of if they are lower or higher than the right answer) is declared the winner
+ * if two or more players have the same difference between their answers and the right answer, a new 
+ * tie-break question is given until a winner can be declared.
+ * @author Matthew Walheim
+ * @author Luke Gerhart
+ * Date: 4/13/15
+ */
+ 
 import java.io.*;
 import java.util.*;
 

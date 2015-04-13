@@ -14,7 +14,7 @@
  * @author Luke Gerhart
  * Date: 4/13/15
  */
- 
+
 import java.io.*;
 import java.util.*;
 
@@ -40,15 +40,16 @@ public class Trivia {
 		int lineCount=0;
 		int tieLineCount=0;
 		int pin=-1;
+		//Opening files needed for the program.
 		try{
 			questionScanner = new Scanner(questionFile);
 		} catch(FileNotFoundException e) {
-			System.out.println("File not found");
+			JOptionPane.showMessageDialog(null, "File not found!", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 		try{
 			tieScanner= new Scanner(tieFile);
 		} catch(FileNotFoundException fnf){
-			System.out.println("File not found");
+			JOptionPane.showMessageDialog(null, "File not found!", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 		while(questionScanner.hasNext()) {
 			questions.add(new Question(questionScanner.nextLine()));
@@ -60,6 +61,7 @@ public class Trivia {
 		}
 		input = JOptionPane.showInputDialog("How many players will there be?");
 		boolean notInteger=true;
+		//Validate number of players.
 		while (numPlayers < 2 && notInteger) {
 			try {
 				numPlayers = Integer.parseInt(input);
@@ -78,6 +80,7 @@ public class Trivia {
 				input = JOptionPane.showInputDialog("Error: invalid input!\nHow many players will there be?: ");
 			}
 		}
+		//Adding players to players ArrayList
 		for(int i=0; i<numPlayers; i++){
 			players.add(new Player());
 			players.get(i).setName(JOptionPane.showInputDialog(null, "Enter Player " + (i+1) + " Name.", "Player Name", JOptionPane.QUESTION_MESSAGE));
@@ -91,7 +94,7 @@ public class Trivia {
 		Object answerChoice = null;
 		Object[] answers = new Object[4];
 		String ansChoice = "";
-		for(int counter=0; counter < 2; counter++){
+		for(int counter=0; counter < 6; counter++){
 			randomNum=random(questions.size());
 			for(int i=0; i<numPlayers; i++){
 				pinStr = JOptionPane.showInputDialog(null, players.get(i).getName()+"'s Turn. \nEnter Pin: ", "PIN", JOptionPane.QUESTION_MESSAGE);
@@ -101,8 +104,10 @@ public class Trivia {
 				for (int k = 0; k < 4; k++) {
 					answers[k] = questions.get(randomNum).getAnswers()[k];
 				}
+				//Ask question and record answer.
 				answerChoice = JOptionPane.showInputDialog(null, questions.get(randomNum).getQuestion(), "Question " + (counter + 1), 
 						JOptionPane.QUESTION_MESSAGE, null, answers, answers[0]);
+				//answerChoice is an Object object, so it needs to be cast to a String
 				ansChoice = ((String) answerChoice);
 				ansChoice = String.valueOf(ansChoice.charAt(0));
 				if(ansChoice.equalsIgnoreCase(questions.get(randomNum).getRightAnswer())){
@@ -112,7 +117,8 @@ public class Trivia {
 					//Do nothing
 				}
 				
-			}	
+			}
+			//Remove used question
 			questions.remove(randomNum);
 			for(int i=0; i<numPlayers; i++){
 				message = message.concat(players.get(i).getName()+"'s Points: "+players.get(i).getPoints() + "\n");
@@ -120,9 +126,13 @@ public class Trivia {
 			JOptionPane.showMessageDialog(null, message, "Points", JOptionPane.INFORMATION_MESSAGE);
 			message = "";
 		}
+		
+		//Determine who tied after the 6th question.
 		winners.add(players.get(0));
 		for(int i=1; i<players.size(); i++){
 			if(players.get(i).getPoints()>winners.get(0).getPoints()){
+				//If the next player in the ArrayList has a higher point value than the others,
+				//The ArrayList is cleared and the player is added.
 				winners.clear();
 				winners.add(players.get(i));
 			}
@@ -132,19 +142,21 @@ public class Trivia {
 		}
 		if(winners.size()>1){
 			boolean flag= true;
-			int tieRandom=-1;
+			int tieRandom=0;
 			int tieAnswer;
-			while(flag){//while flag
-				tieRandom= random(winners.size());
+			while(flag){
+				tieRandom= random(tieLineCount);
 				for(int i=0; i<winners.size();i++){
 					pinStr = JOptionPane.showInputDialog(null, winners.get(i).getName()+"'s Turn. \nEnter Pin: ", "PIN", JOptionPane.QUESTION_MESSAGE);
 					while(validatePin(pinStr)!= winners.get(i).getPin()){
 						pinStr = JOptionPane.showInputDialog(null, "Error! \nPlease enter correct pin.", "Warning", JOptionPane.WARNING_MESSAGE);
 					}
+					//Display tie-break question and record answer.
 					tieAnswer = validateInt(JOptionPane.showInputDialog(null, tieBreaks.get(tieRandom).getQuestion(), "Tie Break Question", JOptionPane.QUESTION_MESSAGE));
 					winners.get(i).setTieValue(tieBreaks.get(tieRandom).getAnswers()-tieAnswer);
 				}
 					
+				//Determine if there are ties during the 
 				tieWinners.add(winners.get(0));
 				for(int i=1; i<winners.size(); i++){
 					if(winners.get(i).getTieValue()<tieWinners.get(0).getTieValue()){
@@ -155,6 +167,7 @@ public class Trivia {
 						tieWinners.add(winners.get(i));
 					}	
 				}
+				//If there is a tie, the tie-break round starts again.
 				if(tieWinners.size()>1){
 					winners.clear();
 					for(int i=0; i<tieWinners.size(); i++){
@@ -162,16 +175,17 @@ public class Trivia {
 						flag= true;
 					}
 					tieWinners.clear();
-				}
-
-				else{
+				} 
+				else {
 					flag= false;
+					//Sort the winner of the tie-break by lowest tieValue
 					Collections.sort(tieWinners,Player.PlayerTieComparator);
 					JOptionPane.showMessageDialog(null, "The winner is "+ tieWinners.get(0).getName(), "Congratulations!", JOptionPane.INFORMATION_MESSAGE);
 				}
-			}//end while
+			}
 		}
 		else {
+			//Sort the player's points in increasing order. Winner is the last player in the ArrayList.
 			Collections.sort(players,Player.PlayerPointComparator);
 			JOptionPane.showMessageDialog(null, "The winner is "+ players.get(players.size()-1).getName(), "Congratualations!", JOptionPane.INFORMATION_MESSAGE);
 		}
